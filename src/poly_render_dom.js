@@ -12,6 +12,7 @@ function latex_sign(op)
     case TOK_GE: return " \\ge ";
     case TOK_ADD: return '+';
     case TOK_SUB: return '-';
+    case TOK_SLASH: return '/';
   }
   return '?';
 }

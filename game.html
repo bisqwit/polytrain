@@ -3,7 +3,7 @@
 <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
 <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 <meta http-equiv='Content-Script-Type' content='text/javascript'>
-<script type='text/javascript' async onload='boot()' src='game.js'></script>
+<script type='text/javascript' defer onload='boot()' src='game.js'></script>
 <style type='text/css'>
 <!--
 body{overflow:hidden}#statswin{position:absolute;bottom:12pt;left:0;display:block;width:100%;background:#00a;color:#fff;font-family:"liberation mono",consolas,monospace;font-size:27pt;height:100pt}#gamewin,#stars{display:block;position:absolute;top:0;left:0;overflow:hidden;background:#000;color:#fff;width:100%;height:100%;font-family:Candara,"Liberation serif",serif;font-size:36pt}#stars img{position:absolute;border:0;padding:0;margin:0;left:0;top:0}#answer{width:16em}
@@ -22,9 +22,9 @@ body{overflow:hidden}#statswin{position:absolute;bottom:12pt;left:0;display:bloc
   },
   options: { enableMenu: false }
 };
-  /* 3 boots: game.js, MathJax and html */
+  /* 2 boots: game.js, MathJax. */
   var boots=0
-  function boot() { if(++boots == 3) main_load() }
+  function boot() { if(++boots == 2) main_load() }
 -->
 </script><!-- https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js -->
 
@@ -36,6 +36,3 @@ body{overflow:hidden}#statswin{position:absolute;bottom:12pt;left:0;display:bloc
 <span id="input">Vastaus: <span id="answer"></span> <span id="cursor"></span></span></div>
 <p style="float:right;margin:0px"><noscript>
 <h2>Sorry, but to play this game, you need a Javascript-enabled browser.</h2></noscript>
-<script type="text/javascript" defer>
-boot()
-</script>

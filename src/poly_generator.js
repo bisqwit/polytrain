@@ -41,6 +41,7 @@ term =  { 'fac': number, 'vars':[list of vars] } -- simplified polynomial
 function poly_generate(traits)
 {
   const var_sets = [ [], ['x'], ['x','y'], ['x','b','a'] ]
+  let factor2 = random2(1, 14);
   let make_term = function()
   {
     if(traits['allow_mul'] && random2(0,7) == 0)
@@ -91,10 +92,10 @@ function poly_generate(traits)
     }
     let vars   = []
     let factor = random2(1,10);
-    if(random2(0,200) == 0) factor = 0;
-    if(traits['allow_frac'] && random2(0,59) == 0)
+    if(random2(0, traits['allow_frac'] ? 3000 : 200) == 0) factor = 0;
+    if(traits['allow_frac'] && random2(0,1) == 0)
     {
-      factor /= random2(factor+1, 14);
+      factor /= factor2;
     }
     if(traits['allow_neg'] >= 1 && random2(0,3)==0) factor = -factor;
     if(traits['allow_vars'] && traits['max_degree'])

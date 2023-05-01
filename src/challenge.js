@@ -1,12 +1,12 @@
 
 const simp_challenge_codes = (function(){
   let s=simplification_tasks, res={}
-  for(a in s)
-    for(b in s[a])
-      for(c in s[a][b])
-        for(d in s[a][b][c])
-          for(e in s[a][b][c][d])
-            for(f in s[a][b][c][d][e])
+  for(let a in s)
+    for(let b in s[a])
+      for(let c in s[a][b])
+        for(let d in s[a][b][c])
+          for(let e in s[a][b][c][d])
+            for(let f in s[a][b][c][d][e])
               res[a+b+c+d+e+f] = s[a][b][c][d][e][f].length
   return res;
 })();
@@ -51,7 +51,7 @@ function challenge(tag, poly)
 
   this.x0   = -tag.offsetWidth
   this.x    = 0
-  this.y    = random2(0, room.offsetHeight - tag.offsetHeight) - tag.offsetHeight
+  this.y    = random2(0, room.offsetHeight - tag.offsetHeight*2)
   this.tag  = tag
   this.poly = poly
   this.dead = true
@@ -112,7 +112,7 @@ function spawn()
   }
   var p = poly_generate(t)
   */
-  var code = 'a1Bkni';
+  var code = 'b2Aknj';
   /* Terms (1-8):      abcdefgh
    * Vars (0-3):       0123
    * Mul types (0-15): ABCDEFGHIJKLMNOP

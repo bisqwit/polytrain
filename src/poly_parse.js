@@ -12,6 +12,7 @@ const TOK_LT       = 9;
 const TOK_GT       = 10;
 const TOK_LE       = 11;
 const TOK_GE       = 12;
+const TOK_SLASH    = 13;
 
 /* Supported syntax:
     Decimal numbers:      0.6   0,6  .6   ,6
@@ -59,10 +60,18 @@ function poly_parse(text)
   const r_var_with_exp = /[a-z](?:[⁰¹²³⁴⁵⁶⁷⁸⁹]|\^ *[0-9]+|[1-9])?/
   const r_integer      = /[0-9][0-9]*/
   const r_decimal      = /[-]?[.,][0-9]+|[-]?[0-9]+[.,][0-9]*/
-  const r_mult         = /[*·'×]/
+  const r_mult         = /[*·'×/:]/
   const r_comparison   = /[=]=|<=|=<|>=|=>|<>|><|!=|\/=|<<|>>|[=<>≤≥≠]/
   const r_fraction     = /[:/][0-9][0-9]*/
   const r_sum          = /\+-?|\+|-/
+  const tab = {'⁰':0,'¹':1,'²':2,'³':3,'⁴':4,'⁵':5,'⁶':6,'⁷':7,'⁸':8,'⁹':9,
+               '=':0,'==':0,
+               '≠':1,'!=':1,'/=':1,'<>':1,'><':1,
+               '<':2, '>':3,
+               '≤':4, '<=':4, '=<':4, '<<':4,
+               '⇒':5, '>=':5, '=>':5, '>>':5,
+               '+':6, '-':7, ':':8, '/':8,
+               '_':[TOK_EQ,TOK_NE,TOK_LT,TOK_GT,TOK_LE,TOK_GE, TOK_ADD,TOK_SUB, TOK_SLASH]}
   let rsub = r => r.toString().slice(1,-1)
   let compiled = '('+rsub(r_var_repeated)+  // 1
                ')|('+rsub(r_var_with_exp)+  // 2
@@ -90,20 +99,12 @@ function poly_parse(text)
           {
             let varname = s[0], exponent = s.length;
             if(i == 2 && s.length > 1)
-              switch(s[1])
-              {
-                case '⁰': exponent = 0; break;
-                case '¹': exponent = 1; break;
-                case '²': exponent = 2; break;
-                case '³': exponent = 3; break;
-                case '⁴': exponent = 4; break;
-                case '⁵': exponent = 5; break;
-                case '⁶': exponent = 6; break;
-                case '⁷': exponent = 7; break;
-                case '⁸': exponent = 8; break;
-                case '⁹': exponent = 9; break;
-                default: exponent = parseInt(s.slice(s[1] == '^' ? 2 : 1));
-              }
+            {
+              if(s[1] in tab)
+                exponent = tab[s[1]]
+              else
+                exponent = parseInt(s.slice(s[1] == '^' ? 2 : 1));
+            }
             tokens.push([TOK_VAR_EXP, varname, exponent])
             break;
           }
@@ -123,26 +124,11 @@ function poly_parse(text)
             break;
           }
           case 6: // comparison operator
-          {
-            switch(s)
-            {
-              case '=': case '==': tokens.push(TOK_EQ); break;
-              case '≠': case '!=': case '/=': case '<>': case '><': tokens.push(TOK_NE); break;
-              case '<': tokens.push(TOK_LT); break;
-              case '>': tokens.push(TOK_GT); break;
-              case '≤': case '<=': case '=<': case '<<': tokens.push(TOK_LE); break;
-              case '≥': case '>=': case '=>': case '>>': tokens.push(TOK_GE); break;
-            }
-            break;
-          }
           case 7: // multiplication sign
-          {
-            // ignored
-            break;
-          }
           case 8: // plus or minus sign
           {
-            tokens.push(s == '+' ? TOK_ADD : TOK_SUB)
+            if(s in tab) tokens.push(tab._[tab[s]])
+            // other multiplication signs are ignored
             break;
           }
         }//switch
@@ -182,6 +168,10 @@ function poly_parse(text)
           if(!have_term) { term.fac = -term.fac; break; }
           append();
           term.fac = -term.fac;
+          break;
+        case TOK_SLASH:
+          trail.push(tokens[a]);
+          errors = true;
           break;
         case TOK_EQ:
         case TOK_NE:

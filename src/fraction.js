@@ -7,7 +7,7 @@
  * If number is negative, returns [-nominator, denominator]
  * If number is integer, returns [number, 1]
  */
-function make_fraction(number)
+function make_fraction(number, limit=true)
 {
   let sign = 1;
   if(number < 0) { sign = -sign; number = -number; }
@@ -28,7 +28,7 @@ function make_fraction(number)
       v = u;
       u = w;
     }
-    if(maxdepth > 1 && u > 30 && v > 30) break;
+    if(maxdepth > 1 && limit && result[1] != 1 && u > 300 && v > 300) break;
     result = [sign*u, v];
     let error = Math.abs(number - u/v);
     if(error <= 1e-6)

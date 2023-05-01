@@ -12,20 +12,48 @@ echo -n "const";for n in 0 1 2 3 4 5 6 7 8 9;do echo -n ",v"m"$n=m(-$n,[]),v$n=m
 */
     std::cout << R"(
 const simplification_tasks = (function(){
-const vx=["x"],vxx=["x","x"],vxxx=["x","x","x"];
-const vy=["y"],vyy=["y","y"],vyyy=["y","y","y"];
-const vxy=["x","y"];
-let m=(f,v=[])=>({fac:f,vars:v})
-let M=f=>({mul:f})
-let N=f=>({neg:f})
-const vx0=m(0,vx),vxm1=m(-1,vx),vx1=m(1,vx),vxm2=m(-2,vx),vx2=m(2,vx),vxm3=m(-3,vx),vx3=m(3,vx),vxm4=m(-4,vx),vx4=m(4,vx),vxm5=m(-5,vx),vx5=m(5,vx),vxm6=m(-6,vx),vx6=m(6,vx),vxm7=m(-7,vx),vx7=m(7,vx),vxm8=m(-8,vx),vx8=m(8,vx),vxm9=m(-9,vx),vx9=m(9,vx),vxm10=m(-10,vx),vx10=m(10,vx)
-const vy0=m(0,vy),vym1=m(-1,vy),vy1=m(1,vy),vym2=m(-2,vy),vy2=m(2,vy),vym3=m(-3,vy),vy3=m(3,vy),vym4=m(-4,vy),vy4=m(4,vy),vym5=m(-5,vy),vy5=m(5,vy),vym6=m(-6,vy),vy6=m(6,vy),vym7=m(-7,vy),vy7=m(7,vy),vym8=m(-8,vy),vy8=m(8,vy),vym9=m(-9,vy),vy9=m(9,vy),vym10=m(-10,vy),vy10=m(10,vy)
-const vxx0=m(0,vxx),vxxm1=m(-1,vxx),vxx1=m(1,vxx),vxxm2=m(-2,vxx),vxx2=m(2,vxx),vxxm3=m(-3,vxx),vxx3=m(3,vxx),vxxm4=m(-4,vxx),vxx4=m(4,vxx),vxxm5=m(-5,vxx),vxx5=m(5,vxx),vxxm6=m(-6,vxx),vxx6=m(6,vxx),vxxm7=m(-7,vxx),vxx7=m(7,vxx),vxxm8=m(-8,vxx),vxx8=m(8,vxx),vxxm9=m(-9,vxx),vxx9=m(9,vxx),vxxm10=m(-10,vxx),vxx10=m(10,vxx)
-const vyy0=m(0,vyy),vyym1=m(-1,vyy),vyy1=m(1,vyy),vyym2=m(-2,vyy),vyy2=m(2,vyy),vyym3=m(-3,vyy),vyy3=m(3,vyy),vyym4=m(-4,vyy),vyy4=m(4,vyy),vyym5=m(-5,vyy),vyy5=m(5,vyy),vyym6=m(-6,vyy),vyy6=m(6,vyy),vyym7=m(-7,vyy),vyy7=m(7,vyy),vyym8=m(-8,vyy),vyy8=m(8,vyy),vyym9=m(-9,vyy),vyy9=m(9,vyy),vyym10=m(-10,vyy),vyy10=m(10,vyy)
-const v0=m(0,[]),vm1=m(-1,[]),v1=m(1,[]),vm2=m(-2,[]),v2=m(2,[]),vm3=m(-3,[]),v3=m(3,[]),vm4=m(-4,[]),v4=m(4,[]),vm5=m(-5,[]),v5=m(5,[]),vm6=m(-6,[]),v6=m(6,[]),vm7=m(-7,[]),v7=m(7,[]),vm8=m(-8,[]),v8=m(8,[]),vm9=m(-9,[]),v9=m(9,[]),vm10=m(-10,[]),v10=m(10,[])
-
-const res =
+const K=(f,v=[])=>({fac:f,vars:v})
+const M=f=>({mul:f})
+const N=f=>({neg:f})
+const F=(s)=>poly_parse(s)[2][0]['vars']
 )";
+    for(int x=0; x<=3; ++x)
+    for(int y=0; y<=3; ++y)
+    for(int a=0; a<=3; ++a)
+    for(int b=0; b<=3; ++b)
+    {
+        std::string f = "";
+        if(x) { f += 'x'; if(x>1) f += '0'+x; }
+        if(y) { f += 'y'; if(y>1) f += '0'+y; }
+        if(a) { f += 'a'; if(a>1) f += '0'+a; }
+        if(b) { f += 'b'; if(b>1) f += '0'+b; }
+        if(f.empty()) continue;
+        std::cout << "," << f << "=F('" << f << "')";
+        /*std::string arr = "["; const char* sep = "\"";
+        for(int m=0; m<x; ++m) { arr += sep; arr += 'x'; sep="\",\""; }
+        for(int m=0; m<y; ++m) { arr += sep; arr += 'y'; sep="\",\""; }
+        for(int m=0; m<a; ++m) { arr += sep; arr += 'a'; sep="\",\""; }
+        for(int m=0; m<b; ++m) { arr += sep; arr += 'b'; sep="\",\""; }
+        arr += "\"]";
+        std::cout << "," << f << "=" << arr;*/
+    }
+    for(int n=0; n<=10; ++n)
+    {
+        std::cout << ",X"<<n << "=K(" << n << ",x)";
+        std::cout << ",XX"<<n << "=K(" << n << ",x2)";
+        std::cout << ",Y"<<n << "=K(" << n << ",y)";
+        std::cout << ",YY"<<n << "=K(" << n << ",y2)";
+        std::cout << ",v"<<n << "=K(" << n << ")";
+        if(n)
+        {
+            std::cout << ",Xm"<<n << "=K(-" << n << ",x)";
+            std::cout << ",XXm"<<n << "=K(-" << n << ",x2)";
+            std::cout << ",Ym"<<n << "=K(-" << n << ",y)";
+            std::cout << ",YYm"<<n << "=K(-" << n << ",y2)";
+            std::cout << ",vm"<<n << "=K(-" << n << ")";
+        }
+    }
+    std::cout << ",\nres = ";
 
     std::map<char/*terms*/,
     std::map<char/*vars*/,
@@ -43,6 +71,16 @@ const res =
     {
         if(line.substr(0,2) != "[\"")
             continue;
+
+        for(std::size_t a=0; a+3<line.size(); ++a)
+        {
+            if(line[a] == 'm' && line[a+1] == '(' &&
+              (line[a+2] == '-'
+              || (line[a+2] >= '0' && line[a+2] <= '9')))
+            {
+                line[a] = 'K';
+            }
+        }
 
         auto& v = data[line[2]]
             [line[3]]

@@ -186,7 +186,7 @@ function has_fract(poly)
     }
     else
     {
-      let m = make_fraction(p['fac']);
+      let m = make_fraction(p['fac'], false);
       if(m[1] != 1)
       {
         res |= 1;
@@ -202,6 +202,33 @@ function has_fract(poly)
   find_fract(poly_simplify(poly));
   return res;
 }
+function largest_factor(poly)
+{
+  let res=0, find_fac=function(p)
+  {
+    if(is_array(p))
+    {
+      for(let a=0; a<p.length; ++a) find_fac(p[a]);
+    }
+    else if(p.hasOwnProperty('mul'))
+    {
+      find_fac(p['mul']);
+    }
+    else if(p.hasOwnProperty('neg'))
+    {
+      find_fac(p['neg']);
+    }
+    else
+    {
+      let m = make_fraction(p['fac'], false);
+      res = Math.max(res, Math.abs(p['fac']))
+      res = Math.max(res, Math.abs(m[0]))
+      res = Math.max(res, Math.abs(m[1]))
+    }
+  }
+  find_fac(poly);
+  return res;
+}
 
 
 let num_for_code={}
@@ -211,14 +238,22 @@ for(let n=0; n<500000; ++n)
   t.allow_vars = random2(0,3)==0 ? 2 : 1;
   t.max_degree = random2(1,3);
   t.allow_mul  = random2(0,3);
+  t.allow_frac = random2(0,3)==0;
   let poly = poly_generate(t)
+  let simp = poly_simplify(poly);
 
   let text0 = poly_rendertext(poly);
   let text1 = poly_rendertext(poly_sort(poly));
-  let text2 = poly_rendertext(poly_simplify(poly));
+  let text2 = poly_rendertext(simp);
   if(text1 == text2) continue;
   //if(text2 == '0') continue;
   //console.log(poly_rendertext(poly_sort(poly)), "\n", poly_rendertext(poly_simplify(poly)));
+
+  let fac = largest_factor(simp);
+  if(fac > 19 && fac != 20 && fac != 30 && fac != 40 && fac != 50 && fac != 100)
+  {
+    continue;
+  }
 
   /*
   console.log(poly_rendertext( poly))
@@ -238,7 +273,7 @@ for(let n=0; n<500000; ++n)
   let fract     = has_fract(poly);
   
   if(has_power > 5) continue;
-  if(fract & 2) continue;
+  if(fract & 2) continue; // Too complex fractions
 
   /* Terms (1-8):      abcdefgh
    * Vars (0-3):       0123
@@ -275,11 +310,11 @@ for(let n=0; n<500000; ++n)
       let res = []
       if(q.hasOwnProperty('fac'))
       {
-        v = q['fac']
-        let s='', f = make_fraction(v);
+        let v = q['fac']
+        let s='', f = make_fraction(v, false);
         if(f[1]==1) s = f[0]; else s = f[0]+'/'+f[1]
-        if(q['vars'].length==0) return 'm('+s+')'
-        return 'm('+s+','+stringify(q['vars'])+')'
+        if(q['vars'].length==0) return 'K('+s+')'
+        return 'K('+s+','+stringify(q['vars'])+')'
       }
       if(q.hasOwnProperty('neg'))
         return 'N('+stringify(q['neg'])+')'
@@ -290,7 +325,7 @@ for(let n=0; n<500000; ++n)
         let v = q[k], s = ''
         if(k == 'fac')
         {
-          let f = make_fraction(v);
+          let f = make_fraction(v, false);
           if(f[1]==1) s = f[0]; else s = f[0]+'/'+f[1]
         }
         else
@@ -311,22 +346,37 @@ for(let n=0; n<500000; ++n)
   //s = s.replaceAll('"vars"', 'vars')
   //s = s.replaceAll('"neg"', 'neg')
   //s = s.replaceAll('"mul"', 'mul')
-  s = s.replaceAll('["x"]',          'vx')
-  s = s.replaceAll('["y"]',          'vy')
-  s = s.replaceAll('["x","x"]',      'vxx')
-  s = s.replaceAll('["y","y"]',      'vyy')
-  s = s.replaceAll('["x","y"]',      'vxy')
-  s = s.replaceAll('["x","x","x"]',  'vxxx')
-  s = s.replaceAll('["y","y","y"]',  'vyyy')
-  for(let n=0; n<=10; ++n) s = s.replaceAll('m('+n+',vx)',  'vx'+n)
-  for(let n=0; n<=10; ++n) s = s.replaceAll('m('+n+',vxx)', 'vxx'+n)
-  for(let n=1; n<=10; ++n) s = s.replaceAll('m(-'+n+',vx)',  'vxm'+n)
-  for(let n=1; n<=10; ++n) s = s.replaceAll('m(-'+n+',vxx)', 'vxxm'+n)
-  for(let n=0; n<=10; ++n) s = s.replaceAll('m('+n+',vy)',  'vy'+n)
-  for(let n=0; n<=10; ++n) s = s.replaceAll('m('+n+',vyy)', 'vyy'+n)
-  for(let n=1; n<=10; ++n) s = s.replaceAll('m(-'+n+',vy)',  'vym'+n)
-  for(let n=1; n<=10; ++n) s = s.replaceAll('m(-'+n+',vyy)', 'vyym'+n)
-  for(let n=0; n<=10; ++n) s = s.replaceAll('m('+n+')', 'v'+n)
-  for(let n=1; n<=10; ++n) s = s.replaceAll('m(-'+n+')', 'vm'+n)
+  /*s = s.replaceAll('["x"]',          'x')
+  s = s.replaceAll('["y"]',          'y')
+  s = s.replaceAll('["x","x"]',      'x2')
+  s = s.replaceAll('["y","y"]',      'y2')
+  s = s.replaceAll('["x","y"]',      'xy')
+  s = s.replaceAll('["x","x","x"]',  'x3')
+  s = s.replaceAll('["y","y","y"]',  'y3')*/
+  for(let x=0; x<=3; ++x)
+  for(let y=0; y<=3; ++y)
+  for(let a=0; a<=3; ++a)
+  for(let b=0; b<=3; ++b)
+  {
+    let f = '';
+    if(x) { f += 'x'; if(x>1) f += x }
+    if(y) { f += 'y'; if(y>1) f += y }
+    if(a) { f += 'a'; if(a>1) f += a }
+    if(b) { f += 'b'; if(b>1) f += b }
+    if(f=='')continue
+    let r = poly_parse(f)[2]
+    let p = stringify(r[0]['vars'])
+    s = s.replaceAll(p, f)
+  }
+  for(let n=0; n<=10; ++n) s = s.replaceAll('K('+n+',x)',  'X'+n)
+  for(let n=0; n<=10; ++n) s = s.replaceAll('K('+n+',x2)', 'XX'+n)
+  for(let n=1; n<=10; ++n) s = s.replaceAll('K(-'+n+',x)', 'Xm'+n)
+  for(let n=1; n<=10; ++n) s = s.replaceAll('K(-'+n+',x2)','XXm'+n)
+  for(let n=0; n<=10; ++n) s = s.replaceAll('K('+n+',y)',  'Y'+n)
+  for(let n=0; n<=10; ++n) s = s.replaceAll('K('+n+',y2)', 'YY'+n)
+  for(let n=1; n<=10; ++n) s = s.replaceAll('K(-'+n+',y)', 'Ym'+n)
+  for(let n=1; n<=10; ++n) s = s.replaceAll('K(-'+n+',y2)','YYm'+n)
+  for(let n=0; n<=10; ++n) s = s.replaceAll('K('+n+')',    'v'+n)
+  for(let n=1; n<=10; ++n) s = s.replaceAll('K(-'+n+')',   'vm'+n)
   console.log(s)
 }

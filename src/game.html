@@ -8,9 +8,9 @@
   },
   options: { enableMenu: false }
 };
-  /* 3 boots: game.js, MathJax and html */
+  /* 2 boots: game.js, MathJax. */
   var boots=0
-  function boot() { if(++boots == 3) main_load() }
+  function boot() { if(++boots == 2) main_load() }
 --></script>
 <!-- https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js -->
  <script type="text/javascript" id="MathJax-script" async src="tex-svg.js"
@@ -33,8 +33,5 @@ Taso: <span id="skill"></span><br>
 <p style="float:right;margin:0px"><noscript>
 <h2>Sorry, but to play this game, you need a Javascript-enabled browser.</h2></noscript>
 </p>
-
-<script type="text/javascript" defer>boot()</script>
-
 
  </body>
