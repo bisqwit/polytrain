@@ -57,7 +57,13 @@ function poly_renderterm(poly)
   
   let frac   = make_fraction(poly['fac']);
   let result = frac[0] + '';
+
   let vars = {}, p = poly['vars'];
+  if(p.length)
+  {
+    if(result == '1') result = '';
+    if(result == '-1') result = '-';
+  }
   for(let a=0; a<p.length; ++a)
   {
     let c = p[a];

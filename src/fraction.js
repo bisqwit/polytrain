@@ -12,7 +12,7 @@ function make_fraction(number)
   let sign = 1;
   if(number < 0) { sign = -sign; number = -number; }
   let result = [sign*Math.round(number), 1];
-  for(let maxdepth = 1; maxdepth <= 10; ++maxdepth)
+  for(let maxdepth = 1; maxdepth <= 30; ++maxdepth)
   {
     let cf = []
     let a  = number;
@@ -28,7 +28,7 @@ function make_fraction(number)
       v = u;
       u = w;
     }
-    if(v > 30) break;
+    if(maxdepth > 1 && u > 30 && v > 30) break;
     result = [sign*u, v];
     let error = Math.abs(number - u/v);
     if(error <= 1e-6)

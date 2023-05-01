@@ -53,6 +53,7 @@ function poly_generate(traits)
       {
         case 1: // Scalar with polynomial
           traits['allow_mul'] = 0;
+          traits['max_terms'] = 2;
           poly = poly_generate(traits);   // Make polynomial
           traits['max_degree'] = 0;
           scalar = [ make_term() ];       // Make scalar
@@ -61,6 +62,7 @@ function poly_generate(traits)
           break;
         case 2: // Term with polynomial
           traits['allow_mul'] = 0;
+          traits['max_terms'] = 2;
           poly = poly_generate(traits);   // Make polynomial
           term = [ make_term() ];         // Make term
           result['mul'].push(poly)
@@ -88,7 +90,8 @@ function poly_generate(traits)
       return result;
     }
     let vars   = []
-    let factor = random2(0,10);
+    let factor = random2(1,10);
+    if(random2(0,200) == 0) factor = 0;
     if(traits['allow_frac'] && random2(0,59) == 0)
     {
       factor /= random2(factor+1, 14);
@@ -100,12 +103,12 @@ function poly_generate(traits)
       // >= 2:   x and possibly y
       // >= 3:   all sorts of letters
       let s = var_sets[traits['allow_vars']].shuffle();
-      let m = Math.min(3, random2(1, s.length));
+      let m = Math.min(3, random2(0, s.length));
       for(let a=0; a<m; ++a)
         for(let e=random2(1, traits['max_degree']); e > 0; --e)
           vars.push(s[a])
     }
-    result = { 'fac':factor, 'vars':vars };
+    let result = { 'fac':factor, 'vars':vars };
     if(traits['allow_neg'] >= 2 && random2(0,30)==0)
       return { 'neg': result }
     return result;
@@ -113,8 +116,7 @@ function poly_generate(traits)
 
   let result = [];
   let nterms = random2(traits['min_terms'] || 1, traits['max_terms'] || 3);
-  for(let n=0; n<nterms; ++n) result.push(0);
-  result = result.map(x => make_term());
+  for(let n=0; n<nterms; ++n) result.push(make_term());
   return result;
 }
 

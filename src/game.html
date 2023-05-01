@@ -1,16 +1,40 @@
+ <script type="text/javascript"><!--
+ MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  },
+  svg: {
+    fontCache: 'global'
+  },
+  options: { enableMenu: false }
+};
+  /* 3 boots: game.js, MathJax and html */
+  var boots=0
+  function boot() { if(++boots == 3) main_load() }
+--></script>
+<!-- https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js -->
+ <script type="text/javascript" id="MathJax-script" async src="tex-svg.js"
+   onload="javascript:boot()"></script>
   <title>Polynomiharjoitin</title>
  </head>
  <body>
 
-<div id=statswin>
+<div id="stars"></div>
+<div id="gamewin">
+Peliä ladataan, odota hetki…
 </div>
-<div id=gamewin>
-</div>
-<div id=inputwin>
+<div id="statswin">
+Pisteet: <span id="score">0/0</span>
+Taso: <span id="skill"></span><br>
+<span id=input>Vastaus: <span id=answer></span>
+<span id=cursor></span>
 </div>
 
 <p style="float:right;margin:0px"><noscript>
 <h2>Sorry, but to play this game, you need a Javascript-enabled browser.</h2></noscript>
+</p>
+
+<script type="text/javascript" defer>boot()</script>
+
 
  </body>
-</html>

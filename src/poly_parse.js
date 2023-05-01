@@ -57,11 +57,11 @@ function poly_parse(text)
 {
   const r_var_repeated = /[a]{2,}b{2,}c{2,}d{2,}e{2,}f{2,}g{2,}h{2,}i{2,}j{2,}k{2,}l{2,}m{2,}n{2,}o{2,}p{2,}q{2,}r{2,}s{2,}t{2,}u{2,}v{2,}w{2,}x{2,}y{2,}z{2,}/
   const r_var_with_exp = /[a-z](?:[⁰¹²³⁴⁵⁶⁷⁸⁹]|\^ *[0-9]+|[1-9])?/
-  const r_integer      = /[1-9][0-9]*/
+  const r_integer      = /[0-9][0-9]*/
   const r_decimal      = /[-]?[.,][0-9]+|[-]?[0-9]+[.,][0-9]*/
   const r_mult         = /[*·'×]/
-  const r_comparison   = /[=<>≤≥≠]|==|<=|=<|>=|=>|<>|><|!=|\/=|<<|>>/
-  const r_fraction     = /[:/][1-9][0-9]*/
+  const r_comparison   = /[=]=|<=|=<|>=|=>|<>|><|!=|\/=|<<|>>|[=<>≤≥≠]/
+  const r_fraction     = /[:/][0-9][0-9]*/
   const r_sum          = /\+-?|\+|-/
   let rsub = r => r.toString().slice(1,-1)
   let compiled = '('+rsub(r_var_repeated)+  // 1
@@ -165,16 +165,20 @@ function poly_parse(text)
     have_frac = false;
     term = { fac:1, vars:[] };
   };
+  var trail = []
   for(let a = 0; a < tokens.length; ++a)
   {
     if(typeof(tokens[a]) != 'object')
+    {
       switch(tokens[a])
       {
         case TOK_ADD:
+          trail.push(tokens[a]);
           if(!have_term) break; // nothing to do when expecting a term
           append();
           break;
         case TOK_SUB:
+          trail.push(tokens[a]);
           if(!have_term) { term.fac = -term.fac; break; }
           append();
           term.fac = -term.fac;
@@ -193,31 +197,64 @@ function poly_parse(text)
           comp_op = tokens[a];
           break;
       }
-    else switch(tokens[a][0])
+    }
+    else
     {
-      case TOK_VAR_EXP:
-        for(let e = 0; e < tokens[a][2]; ++e)
-          term.vars.push(tokens[a][1]);
-        have_term = true;
-        break;
-      case TOK_DECIMAL:
-      case TOK_INTEGER:
-        if(have_fac) { errors = true; break; } // Ignore repeated factor in one term
-        term.fac *= tokens[a][1];
-        have_term = have_fac = true;
-        break;
-      case TOK_FRACTION:
-        if(have_frac) { errors = true; break; } // Ignore repeated fraction in one term
-        term.fac /= tokens[a][1];
-        have_term = have_fac = have_frac = true;
-        break;
+      trail = [];
+      switch(tokens[a][0])
+      {
+        case TOK_VAR_EXP:
+          for(let e = 0; e < tokens[a][2]; ++e)
+            term.vars.push(tokens[a][1]);
+          have_term = true;
+          break;
+        case TOK_DECIMAL:
+        case TOK_INTEGER:
+          if(have_fac) { errors = true; break; } // Ignore repeated factor in one term
+          term.fac *= tokens[a][1];
+          have_term = have_fac = true;
+          break;
+        case TOK_FRACTION:
+          if(have_frac) { errors = true; break; } // Ignore repeated fraction in one term
+          if(tokens[a][1] == 0) { errors = true; break; }
+          term.fac /= tokens[a][1];
+          have_term = have_fac = have_frac = true;
+          break;
+      }
     }
   }
   if(have_term)          { append(); }
   else if(term.fac != 1) { errors = true; }
-  rhs.sort()
-  lhs.sort()
-  return [lhs, comp_op, rhs, errors];
+
+  let poly_order_term = function(a,b)
+  {
+    let trans = poly=>{
+      let vars = {}, max = 0, prod = 1, p = poly['vars'];
+      for(let a=0; a<p.length; ++a)
+      {
+        let c = p[a];
+        if(vars[c]) vars[c] += 1;
+        else        vars[c] = 1;
+      }
+      //console.log('vars',p,vars)
+      for(let k in vars)
+      {
+        if(vars[k] > max) max = vars[k];
+        prod *= vars[k];
+      }
+      return [poly['fac'], p, max, prod];
+    };
+    a=trans(a);
+    b=trans(b);
+    if(a[2] != b[2]) return b[2] - a[2];
+    if(b[3] != a[3]) return b[3] - a[3];
+    if(a[1] != b[1]) return a[1] < b[1] ? -1 : 1;
+    return b[0] - a[0];
+  }
+  
+  rhs.sort(poly_order_term)
+  lhs.sort(poly_order_term)
+  return [lhs, comp_op, rhs, errors, trail];
 }
 
-//console.log(poly_parse('5axb²3+5+2.4'))
+//console.log(poly_parse('-2/5x+4'))

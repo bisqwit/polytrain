@@ -1,0 +1,9 @@
+[submodule "src/lz-string"]
+	path = src/lz-string
+	url = https://github.com/pieroxy/lz-string/
+[submodule "compress-css"]
+	path = compress-css
+	url = https://github.com/compresscss/compress-css
+[submodule "clean-css"]
+	path = clean-css
+	url = https://github.com/clean-css/clean-css

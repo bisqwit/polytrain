@@ -1,15 +1,32 @@
 'use strict';
 
-function poly_renderdom(poly)
+function latex_sign(op)
 {
-  let html = MathJax.tex2svg(
-    poly_render_latex(poly),
-    {
-      'display':true,
-      'em':12,
-      'ex':6
-    })
+  switch(op)
+  {
+    case TOK_EQ: return ' = ';
+    case TOK_NE: return " \\ne ";
+    case TOK_LT: return ' < ';
+    case TOK_GT: return ' > ';
+    case TOK_LE: return " \\le ";
+    case TOK_GE: return " \\ge ";
+    case TOK_ADD: return '+';
+    case TOK_SUB: return '-';
+  }
+  return '?';
+}
+function latex_render(latex, action)
+{
+  let options = MathJax.getMetricsFor(gel('gamewin'))
+
+  let html = MathJax.tex2svgPromise(
+    latex,
+    options).then(action)
   return html;
+}
+function poly_renderdom(poly, action)
+{
+  return latex_render(poly_render_latex(poly), action)
 }
 
 function poly_render_latex(poly)
@@ -70,13 +87,27 @@ function poly_renderterm_latex(poly)
   if(frac[1] == 1)
   {
     result = frac[0] + '';
+    let e = result.match(/[e]\+/)
+    if(e)
+      result = result.replace(/[e]\+/, "\\cdot 10^{") + "}"
+    else if((e = result.match(/[e]/)))
+      result = result.replace(/[e]/, "\\cdot 10^{") + "}"
+    result = result.replace(/[.]/, "{,}")
   }
   else
   {
     if(frac[0] < 0) { result += '-'; frac[0] *= -1; }
-    result = "\\frac{" + frac[0] + "}{" + frac[1] + "}";
+    result += "\\frac{" + frac[0] + "}{" + frac[1] + "}";
   }
+  
   let vars   = {}, p = poly['vars'];
+
+  if(p.length)
+  {
+    if(result == '1') result = '';
+    if(result == '-1') result = '-';
+  }
+
   for(let a=0; a<p.length; ++a)
   {
     let c = p[a];

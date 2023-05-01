@@ -122,3 +122,50 @@ function poly_simplify_term(term)
   term.vars.sort();
   return [term];
 }
+
+function poly_sort(poly)
+{
+  let poly_order_term = function(a,b)
+  {
+    let trans = poly=>{
+      if('neg' in poly)
+      {
+        let r = trans(poly['neg']);
+        r[0] *= -1;
+        return r;
+      }
+      if('mul' in poly)
+      {
+        /*let m = poly['mul']
+        for(let n=0; n<m.length; ++n)
+            m[n] = poly_sort(m[n])*/
+        let r = [0,0,0,0]
+        return r
+      }
+      let vars = {}, max = 0, prod = 1, p = poly['vars'];
+      for(let a=0; a<p.length; ++a)
+      {
+        let c = p[a];
+        if(vars[c]) vars[c] += 1;
+        else        vars[c] = 1;
+      }
+      //console.log('vars',p,vars)
+      for(let k in vars)
+      {
+        if(vars[k] > max) max = vars[k];
+        prod *= vars[k];
+      }
+      return [poly['fac'], p, max, prod];
+    };
+    a=trans(a);
+    b=trans(b);
+    if(a[2] != b[2]) return b[2] - a[2];
+    if(b[3] != a[3]) return b[3] - a[3];
+    if(a[1] != b[1]) return a[1] < b[1] ? -1 : 1;
+    return b[0] - a[0];
+  }
+  let p = cloneArray(poly)
+  //console.log(p)
+  p.sort(poly_order_term);
+  return p
+}
