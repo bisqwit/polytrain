@@ -1,6 +1,6 @@
 const RANK_NEGATION    = 4;
-const RANK_FAC_NEG     = 1;
-const RANK_FAC_FRAC    = 3;
+const RANK_FAC_NEG     = 8;
+const RANK_FAC_FRAC    = 7;
 const RANK_FAC_FRAC_WHOLE = 50;
 const RANK_FAC_SIMPLE  = 1;
 const RANK_FAC_OTHER   = 3;
@@ -11,8 +11,8 @@ const RANK_ADD         = 3;
 
 function poly_rank(poly)
 {
-  return Math.max(poly_rank_do(poly),
-                  poly_rank_do(poly_simplify(poly)))
+  return Math.round(Math.max(poly_rank_do(poly),
+                             poly_rank_do(poly_simplify(poly))))
 }
 
 /* Give a numeric score on the complexity of the given polynomial. */

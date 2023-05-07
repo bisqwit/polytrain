@@ -13,6 +13,34 @@ const TOK_GT       = 10;
 const TOK_LE       = 11;
 const TOK_GE       = 12;
 const TOK_SLASH    = 13;
+const tok_text = [/**/,
+                  /*var_exp*/,
+                  /*decimal*/,
+                  /*integer*/,
+                  /*fraction*/,
+                  '+',
+                  '-',
+                  '=',
+                  '≠',
+                  '<',
+                  '>',
+                  '≤',
+                  '≥',
+                  '/']
+const tok_latex = [/**/,
+                   /*var_exp*/,
+                   /*decimal*/,
+                   /*integer*/,
+                   /*fraction*/,
+                   '+',
+                   '-',
+                   '=',
+                   " \\ne ",
+                   '<',
+                   '>',
+                   " \\le ",
+                   " \\ge ",
+                   '/']
 
 /* Supported syntax:
     Decimal numbers:      0.6   0,6  .6   ,6
@@ -54,36 +82,43 @@ const TOK_SLASH    = 13;
     expression is an array of {'fac':number, 'vars':[list of vars]}
     each expression is an additive term.
 */
-function poly_parse(text)
+function poly_parse(text, do_sort = true)
 {
-  const r_var_repeated = /[a]{2,}b{2,}c{2,}d{2,}e{2,}f{2,}g{2,}h{2,}i{2,}j{2,}k{2,}l{2,}m{2,}n{2,}o{2,}p{2,}q{2,}r{2,}s{2,}t{2,}u{2,}v{2,}w{2,}x{2,}y{2,}z{2,}/
+  //const r_var_repeated = RegExp([...Array(26).keys()].map(x=>String.fromCharCode(97+x)).map(c=>c+c+'+').join('|'))
+  //const r_var_repeated = /[a]{2,}|b{2,}|c{2,}|d{2,}|e{2,}|f{2,}|g{2,}|h{2,}|i{2,}|j{2,}|k{2,}|l{2,}|m{2,}|n{2,}|o{2,}|p{2,}|q{2,}|r{2,}|s{2,}|t{2,}|u{2,}|v{2,}|w{2,}|x{2,}|y{2,}|z{2,}/
   const r_var_with_exp = /[a-z](?:[⁰¹²³⁴⁵⁶⁷⁸⁹]|\^ *[0-9]+|[1-9])?/
-  const r_integer      = /[0-9][0-9]*/
+  const r_integer      = /[0-9]+/
   const r_decimal      = /[-]?[.,][0-9]+|[-]?[0-9]+[.,][0-9]*/
-  const r_mult         = /[*·'×/:]/
-  const r_comparison   = /[=]=|<=|=<|>=|=>|<>|><|!=|\/=|<<|>>|[=<>≤≥≠]/
-  const r_fraction     = /[:/][0-9][0-9]*/
-  const r_sum          = /\+-?|\+|-/
+  const r_comparison   = /[<>=]{1,2}|[!/]=|[≤≥≠]/
+  // Comparisons:
+  //   All combinations of = < > are valid, and those marks in singular too:
+  //     == =< =>
+  //     <= << <>
+  //     >= >< >>
+  //  Also
+  //     != /= ≤ ≥ ≠
+  const r_fraction     = /[:/][0-9]+/
+  const r_mult         = /[*·'×/:]/ /* Note: /: is included here only so that we can catch trailing /: signs. */
+  const r_sum          = /\+-|[-+]/
   const tab = {'⁰':0,'¹':1,'²':2,'³':3,'⁴':4,'⁵':5,'⁶':6,'⁷':7,'⁸':8,'⁹':9,
                '=':0,'==':0,
                '≠':1,'!=':1,'/=':1,'<>':1,'><':1,
                '<':2, '>':3,
                '≤':4, '<=':4, '=<':4, '<<':4,
                '⇒':5, '>=':5, '=>':5, '>>':5,
-               '+':6, '-':7, ':':8, '/':8,
+               '+':6, '-':7, '+-':7, ':':8, '/':8,
                '_':[TOK_EQ,TOK_NE,TOK_LT,TOK_GT,TOK_LE,TOK_GE, TOK_ADD,TOK_SUB, TOK_SLASH]}
-  let rsub = r => r.toString().slice(1,-1)
-  let compiled = '('+rsub(r_var_repeated)+  // 1
-               ')|('+rsub(r_var_with_exp)+  // 2
-               ')|('+rsub(r_decimal)+       // 3
-               ')|('+rsub(r_integer)+       // 4
-               ')|('+rsub(r_fraction)+      // 5
-               ')|('+rsub(r_comparison)+    // 6
-               ')|('+rsub(r_mult)+          // 7
-               ')|('+rsub(r_sum)+           // 8
+  const rsub = r => r.toString().slice(1,-1)
+  const patn = '('+rsub(r_var_with_exp)+  // 1
+               ')|('+rsub(r_decimal)+       // 2
+               ')|('+rsub(r_integer)+       // 3
+               ')|('+rsub(r_fraction)+      // 4
+               ')|('+rsub(r_comparison)+    // 5
+               ')|('+rsub(r_mult)+          // 6
+               ')|('+rsub(r_sum)+           // 7
                ')|.';
-  compiled = new RegExp(compiled, 'g');
-  let results = [...text.matchAll(compiled)];
+  const compiled = new RegExp(patn, 'g');
+  const results = [...text.matchAll(compiled)];
   let tokens  = []
   for(let k in results)
   {
@@ -94,11 +129,11 @@ function poly_parse(text)
         let s = k[i];
         switch(i)
         {
-          case 1: // variable repeated
-          case 2: // variable with optional exponent
+          //case 1: // variable repeated
+          case 1: // variable with optional exponent
           {
             let varname = s[0], exponent = s.length;
-            if(i == 2 && s.length > 1)
+            if(exponent > 1)//i == 2 && s.length > 1)
             {
               if(s[1] in tab)
                 exponent = tab[s[1]]
@@ -108,24 +143,24 @@ function poly_parse(text)
             tokens.push([TOK_VAR_EXP, varname, exponent])
             break;
           }
-          case 3: // decimal number
+          case 2: // decimal number
           {
             tokens.push([TOK_DECIMAL, parseFloat(s.replaceAll(',', '.'))])
             break;
           }
-          case 4: // integer
+          case 3: // integer
           {
             tokens.push([TOK_INTEGER, parseInt(s)])
             break;
           }
-          case 5: // fraction
+          case 4: // fraction
           {
             tokens.push([TOK_FRACTION, parseInt(s.slice(1))])
             break;
           }
-          case 6: // comparison operator
-          case 7: // multiplication sign
-          case 8: // plus or minus sign
+          case 5: // comparison operator
+          case 6: // multiplication sign
+          case 7: // plus or minus sign
           {
             if(s in tab) tokens.push(tab._[tab[s]])
             // other multiplication signs are ignored
@@ -141,10 +176,13 @@ function poly_parse(text)
    *   ignore SUB and negate the decimal/integer
    */
   let term = { fac:1, vars:[] }, have_term = false, have_fac = false, have_frac = false;
-  let lhs=[], rhs=[], comp_op, errors = false;
+  let lhs=[], rhs=[], comp_op = null, errors = false;
   let append = function()
   {
-    term.vars.sort();
+    if(do_sort)
+    {
+      term.vars.sort();
+    }
     rhs.push(term);
     have_term = false;
     have_fac  = false;
@@ -179,8 +217,8 @@ function poly_parse(text)
         case TOK_GT:
         case TOK_LE:
         case TOK_GE:
-          if(!have_term) { errors = true; break; }      // ignore when term is missing
-          if(comp_op != 'undefined') { errors = true; } // mark error when multiple comparisons are done
+          if(!have_term) { errors = true; break; } // ignore when term is missing
+          if(comp_op) { errors = true; trail.push(tokens[a]); break; } // it is an error when multiple comparisons are done
           append();
           lhs     = rhs;
           rhs     = [];
@@ -242,8 +280,39 @@ function poly_parse(text)
     return b[0] - a[0];
   }
   
-  rhs.sort(poly_order_term)
-  lhs.sort(poly_order_term)
+  if(do_sort)
+  {
+    rhs.sort(poly_order_term)
+    lhs.sort(poly_order_term)
+  }
+
+  if(comp_op && rhs.length)
+  {
+    /* Find out if RHS has more 'x' than LHS does
+     * If they are equal, then if RHS has more vars than LHS does */
+    let find_x = v=>v=='x', sum = a => a.reduce((a,b)=>a+b);
+    let n_x    = f=>f['vars'].filter(find_x).length
+    let n_vars = f=>f['vars'].length
+    
+    let n_lhs = sum(lhs.map(n_vars))
+    let n_rhs = sum(rhs.map(n_vars))
+    let x_lhs = sum(lhs.map(n_x))
+    let x_rhs = sum(rhs.map(n_x))
+    if(x_rhs > x_lhs || (x_rhs == x_lhs && n_rhs > n_lhs))
+    {
+      // Swap the sides, and reverse the comparison sign
+      switch(comp_op)
+      {
+        case TOK_LT: comp_op=TOK_GT; break;
+        case TOK_GT: comp_op=TOK_LT; break;
+        case TOK_LE: comp_op=TOK_GE; break;
+        case TOK_GE: comp_op=TOK_LE; break;
+      }
+      let t=lhs
+      lhs=rhs
+      rhs=t
+    }
+  }
   return [lhs, comp_op, rhs, errors, trail];
 }
 

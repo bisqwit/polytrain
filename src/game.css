@@ -50,3 +50,53 @@ body
 #stars1 {z-index:2}
 #stars2 {z-index:3}
 */
+
+#inputt
+{
+  color:#CCBBC2;
+  display:inline-block;
+  margin:initial;
+  text-align:initial
+}
+#score,#skill,#time,#miss
+{
+  color:#FAD;
+}
+#gameover
+{
+  display:none;
+  z-index:20;
+  position:absolute;
+  top:10%;
+  left:10%;
+  width:80%;
+  height:60%;
+  border:1em solid #F55;
+  background:#600;
+  color:#FF5;
+  font-size:27pt;
+  font-family:arial,helvetica,sans-serif;
+}
+#gameover h1 { color:#FFF; margin-top:5px; padding-top:5px }
+#gameover .feedback { font-size:120% }
+
+#gameover a { color:#5F5 }
+
+#emoji {
+  font-family:"noto color emoji"
+}
+
+#gameover button { font-size:20pt }
+
+#score1,#skill1,#time1,#miss1
+{
+  color:#FAD; font-size:110%
+}
+
+.deco
+{
+  display:block;
+  color:#5F5;
+  font-size:20pt;
+  position:absolute;left:0px;top:0px;
+}

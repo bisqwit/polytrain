@@ -8,14 +8,14 @@
   },
   options: { enableMenu: false }
 };
-  /* 2 boots: game.js, MathJax. */
+  /* 4 boots: game, database, database2, MathJax. */
   var boots=0
-  function boot() { if(++boots == 2) main_load() }
+  function boot() { if(++boots == 4) main_load() }
 --></script>
 <!-- https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js -->
  <script type="text/javascript" id="MathJax-script" async src="tex-svg.js"
    onload="javascript:boot()"></script>
-  <title>Polynomiharjoitin</title>
+  <title>Polynomipeli</title>
  </head>
  <body>
 
@@ -24,10 +24,27 @@
 Peliä ladataan, odota hetki…
 </div>
 <div id="statswin">
-Pisteet: <span id="score">0/0</span>
-Taso: <span id="skill"></span><br>
+Pisteet: <span id="score">0</span> &nbsp; &nbsp;
+Haaste: <span id="skill">x/x</span> &nbsp; &nbsp; 
+Aika: <span id="time">__</span>s &nbsp; &nbsp; 
+Ohi: <span id="miss">0</span> <br>
 <span id=input>Vastaus: <span id=answer></span>
 <span id=cursor></span>
+</div>
+
+<div id="gameover">
+ <h1>Peli päättyi.</h1>
+ Pisteesi:  <span id="score1">0</span><br>
+ Peliaika:  <span id="time1">0</span> sekuntia<br>
+ <hr>
+ 
+ <div class=feedback>
+ Annathan palautetta pelistä (klikkaa tätä):<br>
+ <span class=emoji>👉</span> <a href="https://docs.google.com/forms/d/e/1FAIpQLSe5lJ6-hvOFhjd6GM1X_w3ucrwQEAtVgF5KyBtd0EI_06KmSA/viewform"
+ >Anna palautetta</a>
+ </div>
+ <hr>
+ <button onclick="game_reset()">Aloita uusi peli klikkaamalla tästä</button>
 </div>
 
 <p style="float:right;margin:0px"><noscript>

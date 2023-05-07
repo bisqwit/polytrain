@@ -1,10 +1,6 @@
 /* Copyright (C) 1992,2007,2023 Joel Yliluoma ( https://iki.fi/bisqwit/ ) */
 /* Various javascript utility functions - https://bisqwit.iki.fi/jsgames/ */
 
-Array.prototype.is_array=true;
-function is_array(obj) { return obj.is_array }
-/* needed because IE doesn't support "typeof obj == 'array'" */
-
 function cloneObject(what)
 {
   let res = {}
@@ -28,55 +24,12 @@ function cloneArray(what)
   return result
 }
 
-/* serialize() is actually an implementation of toJSONString(),
- * which is expected to become part of the Javascript standard
- * according to http://www.json.org/json.js .
- * This is a simple and naive implementation.
- */
-function serialize(what)
-{
-  if(what.is_array) return serializeArray(what)
-  if(typeof what == 'object') return serializeObject(what)
-  if(typeof what == 'string') return serializeString(what)
-  return what
-}
-function _serzA(c1,c2,func) /* serialization helper */
-{
-  return c1+(func().join(','))+c2
-}
-function serializeObject(what)
-{
-  return _serzA('{','}',
-    function()
-    {
-      let res=[],i;
-      for(i in what)res.push(serialize(i) + ':' + serialize(what[i]));
-      return res
-    })
-}
-function serializeArray(what)
-{
-  return _serzA('[',']',
-    function()
-    {
-      let res=[],b=what.length,a;
-      for(a=0;a<b;++a) res.push(serialize(what[a]));
-      return res
-    })
-}
-function serializeString(s)
-{
-  let m = { '\b': '\\b', '\t': '\\t', '\n': '\\n', '\f': '\\f',
-            '\r': '\\r', '"' : '\\"', '\\': '\\\\' };
-  return '"' +
-    s.replace(/([^ !#-[\]-~])/g, function(a, b) {
-      let c = m[b], h = '000' + b.charCodeAt().toString(16);
-      return c ? c : ('\\u' + h.slice(h.length-4,4))
-    }) + '"'
-}
-
-function unserialize(what) { return eval('('+what+')') }
-var displayObject = serialize, displayArray = serialize;
+Array.prototype.is_array=true;
+const serialize = JSON.stringify
+const displayObject = serialize
+const displayArray = serialize
+const unserialize = JSON.parse
+const is_array = x=>x.is_array
 
 function propObject(props)
 {

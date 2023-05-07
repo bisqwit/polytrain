@@ -3,18 +3,19 @@
 /* For simplification tasks, we have the algorithm do the work.
  * For solving tasks, we cheat by deciding the answer in advance.
  */
-function poly_simplify(poly)
+function poly_simplify(poly, known=null)
 {
   let result = []
   for(let a=0; a<poly.length; ++a)
   {
-    let poly2 = poly_simplify_term(poly[a]);
+    let poly2 = poly_simplify_term_to_poly(poly[a], known);
     result = poly_add(result, poly2);
   }
-  return result;
+  return poly_sort(result);
 }
 
 /* Adds two simplified polynomials */
+/* Result is always a new object. */
 function poly_add(poly1, poly2)
 {
   //console.log('adding',poly1,poly2)
@@ -85,7 +86,8 @@ function poly_multiply(poly1, poly2)
       let term2 = poly2[b];
       /* Multiply term1 by term2 */
       let product = { 'fac': (term1.fac * term2.fac),
-                      'vars': term1['vars'].concat(term2['vars']) }
+                      'vars': term1['vars'].concat(term2['vars']) } // Creates a copy
+      if(product['fac'] == 0) product['vars'] = []
       product.vars.sort();
       result = poly_add(result, [product]);
     }
@@ -95,13 +97,17 @@ function poly_multiply(poly1, poly2)
 }
 
 /* Accepts term, returns sum */
-function poly_simplify_term(term)
+function poly_simplify_term_to_poly(term, known=null)
 {
   if(term.hasOwnProperty('neg'))
   {
-    let s = poly_simplify_term(term['neg']);
+    //console.log("Negated: ", term)
+    let s = poly_simplify_term_to_poly(term['neg'], known);
+    // result is always a poly consisting of terms.
+    // All scenarios involve creating a new object.
     for(let a=0; a<s.length; ++a)
       s[a]['fac'] *= -1;
+    //console.log("Becomes: ", s)
     return s;
   }
   if(term.hasOwnProperty('mul'))
@@ -109,18 +115,33 @@ function poly_simplify_term(term)
     let poly = term['mul'];
     if(poly.length == 0)
       return [{'fac':1, 'vars':[]}]
-    let lhs = poly_simplify(poly[0]);
+    let lhs = poly_simplify(poly[0], known);
     for(let a=1; a<poly.length; ++a)
     {
-      let rhs = poly_simplify(poly[a]);
+      let rhs = poly_simplify(poly[a], known);
       lhs = poly_multiply(lhs, rhs);
     }
     return lhs;
   }
   /* Polynomial is already simplified. */
   /* Make sure the list of variables is sorted. */
-  term.vars.sort();
-  return [term];
+  /* And return a copy. */
+  let v = [], f = term['fac']
+  if(!known)
+  {
+    v = term['vars'].join('').split('')
+  }
+  else
+  {
+    for(let a=term['vars'], n=0; n<a.length; ++n)
+      if(known[a[n]])
+        f *= known[a[n]]
+      else
+        v.push(a[n])
+  }
+  if(f == 0) { v = [] }
+  v.sort()
+  return [ { 'fac': f, 'vars': v } ]
 }
 
 function poly_sort(poly)
@@ -157,14 +178,31 @@ function poly_sort(poly)
       }
       return [poly['fac'], p, max, prod];
     };
-    a=trans(a);
-    b=trans(b);
+    a = trans(a);
+    b = trans(b);
     if(a[2] != b[2]) return b[2] - a[2];
     if(b[3] != a[3]) return b[3] - a[3];
     if(a[1] != b[1]) return a[1] < b[1] ? -1 : 1;
     return b[0] - a[0];
   }
+  let sort_vars = function(p)
+  {
+    if(is_array(p))
+    {
+      for(let a=0; a<p.length; ++a) sort_vars(p[a])
+    }
+    else if(p.hasOwnProperty('mul'))
+    {
+      sort_vars(p['mul']);
+    }
+    else if(p.hasOwnProperty('neg'))
+    {
+      sort_vars(p['neg']);
+    }
+    else p['vars'].sort()
+  }
   let p = cloneArray(poly)
+  sort_vars(p)
   //console.log(p)
   p.sort(poly_order_term);
   return p

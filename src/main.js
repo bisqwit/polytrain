@@ -5,6 +5,9 @@ var game_enabled = true;
 
 var oldwidth=null;
 var cursorcount=0;
+
+var curinput='', focused=true, score=0;
+
 function render_tick()
 {
   render_schedule_next();
@@ -14,25 +17,39 @@ function render_tick()
     resize();
     oldwidth=w;
   }
-  game_tick()
-
-  let cursor_interval = render_fps/8;
-  if(++cursorcount >= cursor_interval)
-  {
-    cursorcount -= cursor_interval;
-    var f = gel('cursor');
-    f.style.marginLeft='-1ex';
-    f.textContent = (f.textContent == '_' ? ' ' : '_');
-  }
-
   if(game_enabled)
   {
+    game_tick()
+    decorations_tick()
+
+    let cursor_interval = render_fps/8;
+    if(++cursorcount >= cursor_interval)
+    {
+      cursorcount -= cursor_interval;
+      var f = gel('cursor');
+      f.style.marginLeft='-1ex';
+      f.textContent = (f.textContent == '_' ? ' ' : '_');
+    }
+
     stars_update();
   }
 }
 function render_schedule_next()
 {
   setTimeout(render_tick, game_speed_multiplier * 1000.0/render_fps)
+}
+function render_score()
+{
+  const stext = (n,t) => {
+    let b = gel(n)
+    if(b) b.innerText = t
+  }
+  stext('score', Math.round(score, 1))
+  stext('score1', Math.round(score, 1))
+  stext('skill', Math.round(cur_challenge_total, 1) + '/' + Math.round(target_challenge, 1))
+  stext('time', Math.round(game_timer, 1))
+  stext('time1', Math.round(game_timer, 1))
+  stext('miss', Math.round(misses, 1))
 }
 function render_input()
 {
@@ -51,10 +68,13 @@ function render_input()
   latex_render(tex, h=>{
     let i = gel('input'), b=h//.firstChild
     i.replaceChild(b, i.childNodes[1]);
+    b.id='inputt'
+    /*
     b.style.color='#CCBBC2'
     b.style.display='inline-block'
     b.style.margin='initial'
     b.style.textAlign='initial'
+    */
   })
 }
 
@@ -84,15 +104,14 @@ function main_load()
   let room = gel('gamewin')
   dom_wipe(room)
   document.addEventListener('keydown', keydown, false)
-  document.addEventListener('keyup',   keyup,   false)
+  //document.addEventListener('keyup',   keyup,   false)
   window.addEventListener('resize', resize, false)
   window.addEventListener('focus', (ev)=>setfocus(true), false)
   window.addEventListener('blur',  (ev)=>setfocus(false), false)
-  room.addEventListener('mousedown', mouseclick, false)
+  //room.addEventListener('mousedown', mouseclick, false)
   render_schedule_next()
 }
 
-var curinput='', focused=true, score=0;
 function keydown(ev)
 {
   /* https://www.toptal.com/developers/keycode */
@@ -124,17 +143,45 @@ function keydown(ev)
   }
   return false
 }
-function keyup(ev)
+/*function keyup(ev)
 {
   return false
 }
 function mouseclick(ev)
 {
   return false
-}
+}*/
 function setfocus(state)
 {
   focused=state;
   gel('statswin').style.backgroundColor=(focused ? '#00A' : '#000');
   return false
+}
+
+
+function game_over()
+{
+  game_enabled=false;
+  gel('gameover').style.display='block';
+  render_score();
+}
+
+function game_reset()
+{
+  let room = gel('gamewin')
+  dom_wipe(room)
+  gel('gameover').style.display='none';
+
+  curinput='';
+  score=misses=game_timer=completed=last_scorelog=input_idle=cur_challenge_total=0;
+  cur_challenges={}
+  game_enabled=true;
+  skill_multiplier=1;
+  target_challenge=10;
+  gamespeed=4;
+  input_idle_timeout=5;
+  scorelog=[];
+
+  render_score()
+  render_input();
 }

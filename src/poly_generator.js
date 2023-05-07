@@ -40,7 +40,20 @@ term =  { 'fac': number, 'vars':[list of vars] } -- simplified polynomial
 
 function poly_generate(traits)
 {
-  const var_sets = [ [], ['x'], ['x','y'], ['x','b','a'] ]
+  /*
+  const sets_str =
+  ''                             + ';' +
+  '|x'                           + ';' +
+  '|x-y|xy-yx'                   + ';' +
+  '|x-y-a-b|xy-yx-xa-ya-ab|xab';
+  const var_sets = sets_str.split(';').map(s=>s.split('|'))
+  */
+  const set0 = ['']
+  const set1 = ['', 'x']
+  const set2 = ['', 'x-y',     'xy-yx']
+  const set3 = ['', 'x-y-a-b', 'xy-yx-xa-ya-ab', 'xab' ]
+  const var_sets = [set0, set1, set2, set3]
+
   let factor2 = random2(1, 14);
   let make_term = function()
   {
@@ -88,6 +101,8 @@ function poly_generate(traits)
       // Done
       result['mul'].shuffle();
       Object.assign(traits, backup);
+      if(traits['allow_neg'] >= 2 && random2(0,5)==0 && result['mul'].length > 1)
+        return { 'neg': result }
       return result;
     }
     let vars   = []
@@ -103,15 +118,23 @@ function poly_generate(traits)
       // >= 1:   x
       // >= 2:   x and possibly y
       // >= 3:   all sorts of letters
-      let s = var_sets[traits['allow_vars']].shuffle();
-      let m = Math.min(3, random2(0, s.length));
+      let s = var_sets[traits['allow_vars']]        // list of variable options
+      let m = Math.min(3, random2(0, s.length-1));  // choose a set
+      s = s[m].split('-')
+      s = s[random2(0, s.length-1)]
       for(let a=0; a<m; ++a)
-        for(let e=random2(1, traits['max_degree']); e > 0; --e)
+        for(let e=random2(1, (a==0 || s[a]>="x") ? traits['max_degree'] : 1); e > 0; --e)
           vars.push(s[a])
+      /* Do exponents only for "x" and "y", or the first variable in the list. */
     }
     let result = { 'fac':factor, 'vars':vars };
-    if(traits['allow_neg'] >= 2 && random2(0,30)==0)
-      return { 'neg': result }
+    if(traits['allow_neg'] >= 2)
+    {
+      if(result['fac'] < 0)
+        { if(random2(0, 5) == 0) return { 'neg': result } }
+      else
+        { if(random2(0,6000) == 0) return { 'neg': result } }
+    }
     return result;
   };
 

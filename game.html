@@ -4,9 +4,11 @@
 <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 <meta http-equiv='Content-Script-Type' content='text/javascript'>
 <script type='text/javascript' defer onload='boot()' src='game.js'></script>
+<script type='text/javascript' defer onload='boot()' src='database.js'></script>
+<script type='text/javascript' defer onload='boot()' src='database2.js'></script>
 <style type='text/css'>
 <!--
-body{overflow:hidden}#statswin{position:absolute;bottom:12pt;left:0;display:block;width:100%;background:#00a;color:#fff;font-family:"liberation mono",consolas,monospace;font-size:27pt;height:100pt}#gamewin,#stars{display:block;position:absolute;top:0;left:0;overflow:hidden;background:#000;color:#fff;width:100%;height:100%;font-family:Candara,"Liberation serif",serif;font-size:36pt}#stars img{position:absolute;border:0;padding:0;margin:0;left:0;top:0}#answer{width:16em}
+body{overflow:hidden}#statswin{position:absolute;bottom:12pt;left:0;display:block;width:100%;background:#00a;color:#fff;font-family:"liberation mono",consolas,monospace;font-size:27pt;height:100pt}#gamewin,#stars{display:block;position:absolute;top:0;left:0;overflow:hidden;background:#000;color:#fff;width:100%;height:100%;font-family:Candara,"Liberation serif",serif;font-size:36pt}#stars img{position:absolute;border:0;padding:0;margin:0;left:0;top:0}#answer{width:16em}#inputt{color:#ccbbc2;display:inline-block;margin:initial;text-align:initial}#miss,#score,#skill,#time{color:#fad}#gameover{display:none;z-index:20;position:absolute;top:10%;left:10%;width:80%;height:60%;border:1em solid #f55;background:#600;color:#ff5;font-size:27pt;font-family:arial,helvetica,sans-serif}#gameover h1{color:#fff;margin-top:5px;padding-top:5px}#gameover .feedback{font-size:120%}#gameover a{color:#5f5}#emoji{font-family:"noto color emoji"}#gameover button{font-size:20pt}#miss1,#score1,#skill1,#time1{color:#fad;font-size:110%}.deco{display:block;color:#5f5;font-size:20pt;position:absolute;left:0;top:0}
 
 -->
 </style>
@@ -22,17 +24,25 @@ body{overflow:hidden}#statswin{position:absolute;bottom:12pt;left:0;display:bloc
   },
   options: { enableMenu: false }
 };
-  /* 2 boots: game.js, MathJax. */
+  /* 4 boots: game, database, database2, MathJax. */
   var boots=0
-  function boot() { if(++boots == 2) main_load() }
+  function boot() { if(++boots == 4) main_load() }
 -->
 </script><!-- https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js -->
 
 <script type="text/javascript" id="MathJax-script" async src="tex-svg.js" onload="javascript:boot()"></script>
-<title>Polynomiharjoitin</title>
+<title>Polynomipeli</title>
 <div id="stars"></div>
 <div id="gamewin">Peliä ladataan, odota hetki…</div>
-<div id="statswin">Pisteet: <span id="score">0/0</span> Taso: <span id="skill"></span><br>
+<div id="statswin">Pisteet: <span id="score">0</span> &nbsp; &nbsp; Haaste: <span id="skill">x/x</span> &nbsp; &nbsp; Aika: <span id="time">__</span>s &nbsp; &nbsp; Ohi: <span id="miss">0</span><br>
 <span id="input">Vastaus: <span id="answer"></span> <span id="cursor"></span></span></div>
+<div id="gameover">
+<h1>Peli päättyi.</h1>Pisteesi: <span id="score1">0</span><br>
+Peliaika: <span id="time1">0</span> sekuntia<br>
+<hr>
+<div class="feedback">Annathan palautetta pelistä (klikkaa tätä):<br>
+<span class="emoji">👉</span> <a href="https://docs.google.com/forms/d/e/1FAIpQLSe5lJ6-hvOFhjd6GM1X_w3ucrwQEAtVgF5KyBtd0EI_06KmSA/viewform">Anna palautetta</a></div>
+<hr>
+<button onclick="game_reset()">Aloita uusi peli klikkaamalla tästä</button></div>
 <p style="float:right;margin:0px"><noscript>
 <h2>Sorry, but to play this game, you need a Javascript-enabled browser.</h2></noscript>

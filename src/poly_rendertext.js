@@ -1,5 +1,7 @@
 'use strict';
 
+const text_sign = op=>tok_text[op]
+
 function poly_rendertext(poly)
 {
   let result = '';

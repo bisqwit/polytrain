@@ -1,21 +1,7 @@
 'use strict';
 
-function latex_sign(op)
-{
-  switch(op)
-  {
-    case TOK_EQ: return ' = ';
-    case TOK_NE: return " \\ne ";
-    case TOK_LT: return ' < ';
-    case TOK_GT: return ' > ';
-    case TOK_LE: return " \\le ";
-    case TOK_GE: return " \\ge ";
-    case TOK_ADD: return '+';
-    case TOK_SUB: return '-';
-    case TOK_SLASH: return '/';
-  }
-  return '?';
-}
+const latex_sign = op=>tok_latex[op]
+
 function latex_render(latex, action)
 {
   let options = MathJax.getMetricsFor(gel('gamewin'))
@@ -41,8 +27,8 @@ function poly_render_latex(poly)
       p = p['neg'];
       result += '-';
       let s = poly_renderterm_latex(p);
-      if(s.match(/[-+()]/))
-        s = "\\left(" + s + "\\right)";
+      //if(s.match(/[-+()]/))
+      s = "\\left(" + s + "\\right)";
       result += s
     }
     else
@@ -78,7 +64,9 @@ function poly_renderterm_latex(poly)
     });
     for(let a=0; a+1<e.length; ++a)
     {
-      if(e[a][0] != '\\' && e[a+1][0] != '\\')
+      // If neither this nor the next element is surrounded
+      // in parentheses, add cdot
+      if(e[a].slice(0,6) != "\\left(" && e[a+1].slice(0,6) != "\\left(")
         e[a] += " \\cdot ";
     }
     return e.join('')
