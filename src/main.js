@@ -67,7 +67,7 @@ function render_input()
   
   latex_render(tex, h=>{
     let i = gel('input'), b=h//.firstChild
-    i.replaceChild(b, i.childNodes[1]);
+    i.replaceChild(b, i.childNodes[2]);
     b.id='inputt'
     /*
     b.style.color='#CCBBC2'
@@ -83,6 +83,7 @@ function resize()
   let room = gel('gamewin')
   let stat = gel('statswin')
   //console.log(window.innerWidth, window.innerHeight)
+  stat.style.height = (gel('statstab').offsetHeight + gel('score').offsetHeight*2*1.1)+'px'
   room.style.width = window.innerWidth+'px'
   room.style.height = window.innerHeight+'px'
   stat.style.top    = (room.offsetHeight-stat.offsetHeight)+'px'
@@ -104,7 +105,7 @@ function main_load()
   let room = gel('gamewin')
   dom_wipe(room)
   document.addEventListener('keydown', keydown, false)
-  //document.addEventListener('keyup',   keyup,   false)
+  document.addEventListener('keyup',   keyup,   false)
   window.addEventListener('resize', resize, false)
   window.addEventListener('focus', (ev)=>setfocus(true), false)
   window.addEventListener('blur',  (ev)=>setfocus(false), false)
@@ -112,6 +113,7 @@ function main_load()
   render_schedule_next()
 }
 
+let alt=false,meta=false,ctrl=false,shift=false;
 function keydown(ev)
 {
   /* https://www.toptal.com/developers/keycode */
@@ -133,6 +135,16 @@ function keydown(ev)
   }
   else if(ev.key.length == 1) 
   {
+    if(alt && ev.key == 'l')
+    {
+      setlanguage(curlang=='en' ? 'fi' : 'en')
+      return false
+    }
+    if(alt && ev.key == 'v')
+    {
+      game_over();
+      return false;
+    }
     /* input key */
     curinput += ev.key;
     render_input();
@@ -141,13 +153,21 @@ function keydown(ev)
   {
     
   }
+  else if(ev.key == 'Shift') shift=true;
+  else if(ev.key == 'Alt' || ev.key == 'AltGraph') alt=true;
+  else if(ev.key == 'Control') ctrl=true;
+  else if(ev.key == 'Meta' || ev.key == 'Compose') meta=true;
   return false
 }
-/*function keyup(ev)
+function keyup(ev)
 {
+  if(ev.key == 'Shift') shift=false;
+  else if(ev.key == 'Alt' || ev.key == 'AltGraph') alt=false;
+  else if(ev.key == 'Control') ctrl=false;
+  else if(ev.key == 'Meta' || ev.key == 'Compose') meta=false;
   return false
 }
-function mouseclick(ev)
+/*function mouseclick(ev)
 {
   return false
 }*/

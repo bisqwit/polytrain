@@ -33,16 +33,24 @@ body{overflow:hidden}#statswin{position:absolute;bottom:12pt;left:0;display:bloc
 <script type="text/javascript" id="MathJax-script" async src="tex-svg.js" onload="javascript:boot()"></script>
 <title>Polynomipeli</title>
 <div id="stars"></div>
-<div id="gamewin">Peliä ladataan, odota hetki…</div>
-<div id="statswin">Pisteet: <span id="score">0</span> &nbsp; &nbsp; Haaste: <span id="skill">x/x</span> &nbsp; &nbsp; Aika: <span id="time">__</span>s &nbsp; &nbsp; Ohi: <span id="miss">0</span><br>
-<span id="input">Vastaus: <span id="answer"></span> <span id="cursor"></span></span></div>
+<div id="gamewin"><span langkey='$loading'>Peliä ladataan, odota hetki…</span></div>
+<div id="statswin">
+<table width="100%" id="statstab">
+<tr>
+<td><span langkey='$score'>Pisteet</span>: <span id="score">0</span>
+<td><span langkey='$level'>Haaste</span>: <span id="skill">x/x</span>
+<td><span langkey='$timer'>Aika</span>: <span id="time">__</span>&nbsp;s
+<td><span langkey='$miss'>Ohi</span>: <span id="miss">0</span>/10</table><span id="input"><span langkey='$answer'>Vastaus</span>: <span id="answer"></span> <span id="cursor"></span></span></div>
 <div id="gameover">
-<h1>Peli päättyi.</h1>Pisteesi: <span id="score1">0</span><br>
-Peliaika: <span id="time1">0</span> sekuntia<br>
+<h1><span langkey='$gameover'>Peli päättyi.</span></h1><span langkey='$score1'>Pisteesi</span>: <span id="score1">0</span><br>
+<span langkey='$timer1'>Peliaika</span>: <span id="time1">0</span> <span langkey='$timer1b'>sekuntia</span><br>
 <hr>
-<div class="feedback">Annathan palautetta pelistä (klikkaa tätä):<br>
-<span class="emoji">👉</span> <a href="https://docs.google.com/forms/d/e/1FAIpQLSe5lJ6-hvOFhjd6GM1X_w3ucrwQEAtVgF5KyBtd0EI_06KmSA/viewform">Anna palautetta</a></div>
+<div class="feedback"><span langkey='$feedback'>Annathan palautetta pelistä (klikkaa tätä):</span><br>
+<span class="emoji">👉</span> <a id='fblink' href="javascript:alert('Jotain%20meni%20pieleen')"><span langkey='$feedback1'>Anna palautetta</span></a></div>
 <hr>
-<button onclick="game_reset()">Aloita uusi peli klikkaamalla tästä</button></div>
+<button onclick="game_reset()"><span langkey='$newgame'>Aloita uusi peli klikkaamalla tästä</span></button></div>
 <p style="float:right;margin:0px"><noscript>
-<h2>Sorry, but to play this game, you need a Javascript-enabled browser.</h2></noscript>
+<h2>Sorry, but to play this game, you need a Javascript-enabled browser.</h2></noscript><span langkey='$title'>&nbsp;</span>
+<script type="text/javascript">
+var curlang="en";function setlanguage(e){curlang=e;const a={$title:{fi:"Polynomipeli",en:"Polynomial game"},$loading:{fi:"Peliä ladataan, odota hetki…",en:"Loading the game, please wait…"},$score:{fi:"Pisteet",en:"Score"},$level:{fi:"Haaste",en:"Level"},$timer:{fi:"Aika",en:"Time"},$miss:{fi:"Ohi",en:"Miss"},$answer:{fi:"Vastaus",en:"Answer"},$gameover:{fi:"Peli päättyi.",en:"Game over"},$score1:{fi:"Pisteesi",en:"Your score"},$timer1:{fi:"Peliaika",en:"Game time"},$timer1b:{fi:" sekuntia",en:" seconds"},$feedback:{fi:"Annathan palautetta pelistä (klikkaa tätä):",en:"Give feedback on the game (click here):"},$feedback1:{fi:"Anna palautetta",en:"Give feedback"},$newgame:{fi:"Aloita uusi peli klikkaamalla tästä",en:"Start a new game by clicking here"},$fblink:{fi:"https://docs.google.com/forms/d/e/1FAIpQLSe5lJ6-hvOFhjd6GM1X_w3ucrwQEAtVgF5KyBtd0EI_06KmSA/viewform",en:"https://docs.google.com/forms/d/1gwiKaRwbL3UqaczyA-ie8uGaFmWmISs6n_zVZkMwgx8/"}};let i,t,n,l,o=document,s=o.getElementsByTagName("span");for(t=0;t<s.length;++t)"langkey"in(i=s[t].attributes)&&(n=i.langkey.nodeValue)in a&&(l=a[n][e],"$title"==n&&(o.title=l),s[t].replaceChild(o.createTextNode(l),s[t].childNodes[0]));o.getElementById("fblink").href=a.$fblink[e]}(()=>{const e=window.navigator;setlanguage((e.userLanguage||e.language).match(/fi/)?"fi":"en")})();
+</script>

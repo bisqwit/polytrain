@@ -74,7 +74,10 @@ $(JS): $(SCRIPTS) Makefile
 	chmod -w "$@"
 
 TMP=game.html.new
-$(HTML): src/game.html $(JS) $(JSD) $(JSE) $(STYLES) Makefile util/csstidy.sh
+$(HTML): \
+		src/game.html src/language.js \
+		$(JS) $(JSD) $(JSE) $(STYLES) \
+		Makefile util/csstidy.sh
 	rm -f $(TMP)
 	echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">' > $(TMP)
 	echo "<html><head>" >> $(TMP)
@@ -89,6 +92,11 @@ $(HTML): src/game.html $(JS) $(JSD) $(JSE) $(STYLES) Makefile util/csstidy.sh
 	echo >> $(TMP)
 	echo "--></style>" >> $(TMP)
 	cat "$<" >> $(TMP)
+
+	echo '<script type="text/javascript">' >> $(TMP)
+	terser --safari10 --timings -c -m < src/language.js >> $(TMP)
+	echo '</script>' >> $(TMP)
+
 	echo "</html>" >> $(TMP)
 	#scp -Cp $(TMP) chii:.tmptmp
 	- tidy  -utf8 -omit -w 99999  -m $(TMP)

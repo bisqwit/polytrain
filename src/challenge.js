@@ -166,7 +166,7 @@ function update_challenge(tag, xpos, room)
   s.left = xpos+'px'
 }
 
-function challenge(tag, task)
+function challenge(tag, task, code)
 {
   let room = gel('gamewin')
 
@@ -243,13 +243,13 @@ function challenge(tag, task)
     let s = poly_rendertext(poly_simplify(task[2]))
     solutions[s] = true
     this.points = poly_rank(task[2])
-    console.log(poly_rendertext(task[2]), " is worth ", this.points, " pts")
+    console.log(poly_rendertext(task[2]), " in ", code, " is worth ", this.points, " pts")
   }
   else
   {
     let a = poly_rank(task[2]), b = poly_rank(task[0])
-    console.log(poly_rendertext(task[2]), " is worth ", a, " pts")
-    console.log(poly_rendertext(task[0]), " is worth ", b, " pts")
+    console.log(poly_rendertext(task[2]), " in ", code, " is worth ", a, " pts")
+    console.log(poly_rendertext(task[0]), " in ", code, " is worth ", b, " pts")
     this.points = a+b
 
     // An equals-task has two solutions,
@@ -290,7 +290,7 @@ function spawn()
     // Find a free slot in the cur_challenges array
     let n = 0;
     while(n in cur_challenges) ++n;
-    cur_challenges[n] = new challenge(htmltag, task)
+    cur_challenges[n] = new challenge(htmltag, task, code)
     //console.log("Adding challenge of ", cur_challenges[n].points, " pts")
     cur_challenge_total += cur_challenges[n].points
   })

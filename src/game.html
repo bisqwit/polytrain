@@ -19,36 +19,41 @@
  </head>
  <body>
 
+
 <div id="stars"></div>
 <div id="gamewin">
-Peliä ladataan, odota hetki…
+<span langkey='$loading'>Peliä ladataan, odota hetki…</span>
 </div>
 <div id="statswin">
-Pisteet: <span id="score">0</span> &nbsp; &nbsp;
-Haaste: <span id="skill">x/x</span> &nbsp; &nbsp; 
-Aika: <span id="time">__</span>s &nbsp; &nbsp; 
-Ohi: <span id="miss">0</span> <br>
-<span id=input>Vastaus: <span id=answer></span>
+<table width="100%" id="statstab"><tr>
+<td><span langkey='$score'>Pisteet</span>: <span id="score">0</span></td>
+<td><span langkey='$level'>Haaste</span>: <span id="skill">x/x</span></td>
+<td><span langkey='$timer'>Aika</span>: <span id="time">__</span>&nbsp;s</td>
+<td><span langkey='$miss'>Ohi</span>: <span id="miss">0</span>/10</td>
+</tr></table>
+<span id=input><span langkey='$answer'>Vastaus</span>: <span id=answer></span>
 <span id=cursor></span>
 </div>
 
 <div id="gameover">
- <h1>Peli päättyi.</h1>
- Pisteesi:  <span id="score1">0</span><br>
- Peliaika:  <span id="time1">0</span> sekuntia<br>
+ <h1><span langkey='$gameover'>Peli päättyi.</span></h1>
+ <span langkey='$score1'>Pisteesi</span>:  <span id="score1">0</span><br>
+ <span langkey='$timer1'>Peliaika</span>:  <span id="time1">0</span><span langkey='$timer1b'> sekuntia</span><br>
  <hr>
  
  <div class=feedback>
- Annathan palautetta pelistä (klikkaa tätä):<br>
- <span class=emoji>👉</span> <a href="https://docs.google.com/forms/d/e/1FAIpQLSe5lJ6-hvOFhjd6GM1X_w3ucrwQEAtVgF5KyBtd0EI_06KmSA/viewform"
- >Anna palautetta</a>
+ <span langkey='$feedback'>Annathan palautetta pelistä (klikkaa tätä):</span><br>
+ <span class=emoji>👉</span> <a id='fblink' href="javascript:alert('Jotain meni pieleen')"
+ ><span langkey='$feedback1'>Anna palautetta</span></a>
  </div>
  <hr>
- <button onclick="game_reset()">Aloita uusi peli klikkaamalla tästä</button>
+ <button onclick="game_reset()"><span langkey='$newgame'>Aloita uusi peli klikkaamalla tästä</span></button>
 </div>
 
 <p style="float:right;margin:0px"><noscript>
 <h2>Sorry, but to play this game, you need a Javascript-enabled browser.</h2></noscript>
 </p>
+
+<span langkey='$title'>&nbsp;</span>
 
  </body>

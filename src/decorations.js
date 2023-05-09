@@ -16,7 +16,7 @@ function create_score_object(points, source_tag)
   decotag.spawned_at = game_timer;
   decotag.srcpos = [sourcex,sourcey]
   decotag.tgtpos = [targetx,targety]
-  console.log("Created decotag ",decotag, " src=",decotag.srcpos," tgt=",decotag.tgtpos)
+  //console.log("Created decotag ",decotag, " src=",decotag.srcpos," tgt=",decotag.tgtpos)
 
   let s = decotag.style
   let x = decotag.srcpos[0]
